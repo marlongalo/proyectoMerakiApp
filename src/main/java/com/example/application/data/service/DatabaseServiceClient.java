@@ -36,6 +36,4 @@ public interface DatabaseServiceClient {
 	@PUT("turiApp/clientes")
 	Call<ResponseBody> actualizarClientes(@Body ClientModel actualizar);
 
-
-
 }
