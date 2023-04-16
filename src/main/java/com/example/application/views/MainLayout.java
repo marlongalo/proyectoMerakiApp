@@ -2,10 +2,10 @@ package com.example.application.views;
 
 import com.example.application.components.appnav.AppNav;
 import com.example.application.components.appnav.AppNavItem;
+import com.example.application.views.carrito.CarritoView;
 import com.example.application.views.client.ClientView;
-import com.example.application.views.packages.PackagesView;
 import com.example.application.views.payment.PaymentView;
-import com.example.application.views.reservar.ReservarView;
+import com.example.application.views.productos.ProductosView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.Footer;
@@ -15,6 +15,8 @@ import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+//import org.vaadin.lineawesome.LineAwesomeIcon;
+
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -40,7 +42,7 @@ public class MainLayout extends AppLayout {
     }
 
     private void addDrawerContent() {
-        H1 appName = new H1("TuriApp");
+        H1 appName = new H1("MerakiHomeApp");
         appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
         Header header = new Header(appName);
 
@@ -54,10 +56,11 @@ public class MainLayout extends AppLayout {
         // For documentation, visit https://github.com/vaadin/vcf-nav#readme
         AppNav nav = new AppNav();
 
-        nav.addItem(new AppNavItem("Reservar", ReservarView.class, "la la-user"));
-        nav.addItem(new AppNavItem("Payment", PaymentView.class, "la la-map-marker"));
-        nav.addItem(new AppNavItem("Packages", PackagesView.class, "la la-columns"));
-        nav.addItem(new AppNavItem("Client", ClientView.class, "la la-columns"));
+        nav.addItem(new AppNavItem("Carrito", CarritoView.class, "la la-user"));
+		//nav.addItem(new AppNavItem("Carrito", CarritoView.class, LineAwesomeIcon.SHOPPING_CART_SOLID.create()));
+        nav.addItem(new AppNavItem("Pago en linea", PaymentView.class, "la la-map-marker"));
+        nav.addItem(new AppNavItem("Utiles Escolares", ProductosView.class, "la la-columns"));
+        nav.addItem(new AppNavItem("Clientes", ClientView.class, "la la-columns"));
 
         return nav;
     }

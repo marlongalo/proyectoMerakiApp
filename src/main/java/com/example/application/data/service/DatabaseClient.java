@@ -1,11 +1,6 @@
 package com.example.application.data.service;
-
-
-
 import java.util.concurrent.TimeUnit;
-
 import com.google.gson.GsonBuilder;
-
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -52,6 +47,10 @@ public class DatabaseClient {
 	
 	public DatabaseServicePayment getDatabaseServicePayment() {
 		return retrofit.create(DatabaseServicePayment.class);
+	}
+	
+	public DatabaseServiceCarrito getDatabaseServiceCarrito() {
+		return retrofit.create(DatabaseServiceCarrito.class);
 	}
 
 }

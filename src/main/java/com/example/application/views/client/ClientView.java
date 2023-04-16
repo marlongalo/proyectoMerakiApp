@@ -28,7 +28,7 @@ import java.util.Optional;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 @SuppressWarnings("serial")
-@PageTitle("Client")
+@PageTitle("Clientes")
 @Route(value = "client/:clientModelID?/:action?(edit)", layout = MainLayout.class)
 public class ClientView extends Div implements BeforeEnterObserver {
 
@@ -183,10 +183,11 @@ public class ClientView extends Div implements BeforeEnterObserver {
     	//De aqui obtenemos el product ID que se observa en el formulario al dar click en el GRID
         Optional<Long> clientModelId = event.getRouteParameters().get(CLIENTMODEL_ID).map(Long::parseLong);
         if (clientModelId.isPresent()) {//cambio 1
-        	
+        	Long ID = clientModelId.get();
+        	Integer idInteger = ID != null ? ID.intValue() : null;
         	
         	for (ClientModel clientModel : clients ) {//cambio 1
-        		if(clientModel.getClientID() == clientModelId.get()) {//cambio 1
+        		if(clientModel.getClientID() == idInteger) {//cambio 1
         			populateForm(clientModel);//cambio 1
         			break;//cambio 1
         		}//cambio 1

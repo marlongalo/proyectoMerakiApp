@@ -7,9 +7,9 @@ import com.example.application.data.entity.ClientResponse;
 import com.example.application.data.entity.PackageModel;
 import com.example.application.data.entity.PaqueteResponse;
 import com.example.application.data.entity.PaymentModel;
+import com.example.application.data.entity.ProductoCarritoResponse;
 import com.example.application.data.entity.ReservaModel;
 import com.example.application.data.entity.ReservasResponse;
-
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -60,6 +60,13 @@ public class DatabaseServiceImplement {
     
     public boolean actualizarPaquetes(PackageModel actualizar) throws IOException {
     	Call<ResponseBody> call = client.getDatabaseServicePaquetes().actualizarPaquetes(actualizar);
+    	Response<ResponseBody> response = call.execute();
+    	return response.isSuccessful();
+    }
+    
+    
+    public boolean eliminarPaquetes(Integer PackageID) throws IOException {
+    	Call<ResponseBody> call = client.getDatabaseServicePaquetes().eliminarPaquetes(PackageID);
     	Response<ResponseBody> response = call.execute();
     	return response.isSuccessful();
     }
@@ -130,6 +137,21 @@ public class DatabaseServiceImplement {
     	return response.isSuccessful();
     	
     }
+    
+    
+    //OPERACIONES DE LA PANTALLA CARRITO
+    
+    public ProductoCarritoResponse consultarProductoCarrito() throws IOException {
+    	Call<ProductoCarritoResponse> call = client.getDatabaseServiceCarrito().listarProductosCarrito();
+    	
+    	Response<ProductoCarritoResponse> response = call.execute();
+    	if(response.isSuccessful()) {
+    		return response.body();
+    	} else {
+    		return null;
+    	}
+    }
+    
     
 
 }

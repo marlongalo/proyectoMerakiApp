@@ -28,7 +28,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@PageTitle("Payment")
+@PageTitle("Pago de Orden")
 @Route(value = "payment", layout = MainLayout.class)
 public class PaymentView extends Div {
 	
@@ -43,8 +43,8 @@ public class PaymentView extends Div {
 	private TextField secretNumber = new TextField("Número secreto");
 	private TextField dateNumber = new TextField("Fecha de expiración");
 
-    private Button cancel = new Button("Cancel");
-    private Button save = new Button("Save");    
+    private Button cancel = new Button("Cancelar");
+    private Button save = new Button("Pagar");    
     private Span status;
     
     
@@ -160,9 +160,9 @@ public class PaymentView extends Div {
     private Component createFormLayout() {
         FormLayout formLayout = new FormLayout();
         
-        reservasCombo.setLabel("Reservas pendientes");
+        reservasCombo.setLabel("Ordenes pendientes");
         reservasCombo.setWidthFull();
-        reservasCombo.setPlaceholder("Reservas");
+        reservasCombo.setPlaceholder("Orden");
         reservasCombo.setAllowedCharPattern("[\\+\\d]");
         reservasCombo.setItems(itemsReservas);
         reservasCombo.addCustomValueSetListener(e -> reservasCombo.setValue(e.getDetail()));

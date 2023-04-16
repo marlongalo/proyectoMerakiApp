@@ -1,15 +1,22 @@
-package com.example.application.views.packages;
+package com.example.application.views.productos;
 import com.example.application.data.entity.PackageModel;
 import com.example.application.data.entity.PaqueteResponse;
 import com.example.application.data.service.DatabaseServiceImplement;
 import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
+import com.vaadin.flow.component.grid.contextmenu.GridMenuItem;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Hr;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -28,19 +35,20 @@ import java.util.Optional;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 @SuppressWarnings("serial")
-@PageTitle("Packages")
-@Route(value = "packages/:packageModelID?/:action?(edit)", layout = MainLayout.class)
-public class PackagesView extends Div implements BeforeEnterObserver {
+@PageTitle("Meraki Home, Tu tienda exclusiva de materiales para Escolar y Oficina")
+@Route(value = "productos/:packageModelID?/:action?(edit)", layout = MainLayout.class)
+public class ProductosView extends Div implements BeforeEnterObserver {
 
     private final String PACKAGEMODEL_ID = "packageModelID";
-    private final String PACKAGEMODEL_EDIT_ROUTE_TEMPLATE = "packages/%s/edit";
+    private final String PACKAGEMODEL_EDIT_ROUTE_TEMPLATE = "productos/%s/edit";
 
     private final Grid<PackageModel> grid = new Grid<>(PackageModel.class, false);
 
     private TextField namePackage;
     private TextField destiny;
-    private TextField hotel;
+    //private TextField hotel;
     private TextField activities;
+    private TextField price;
 
     private final Button cancel = new Button("Cancelar");
     private final Button save = new Button("Guardar");
@@ -51,12 +59,11 @@ public class PackagesView extends Div implements BeforeEnterObserver {
     private List<PackageModel> models;
 
 
-    public PackagesView() {
+    public ProductosView() {
     	
         addClassNames("packages-view");
         
         db = DatabaseServiceImplement.getInstance();
-
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
 
@@ -67,12 +74,12 @@ public class PackagesView extends Div implements BeforeEnterObserver {
 
         // Configure Grid
         grid.addColumn("packageID").setAutoWidth(true).setHeader("ID");
-        grid.addColumn("namePackage").setAutoWidth(true).setHeader("Nombre");
-        grid.addColumn("destiny").setAutoWidth(true).setHeader("Destino");
-        grid.addColumn("hotel").setAutoWidth(true).setHeader("Hotel");
-        grid.addColumn("activities").setAutoWidth(true).setHeader("Actividades");
-
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        grid.addColumn("namePackage").setAutoWidth(true).setHeader("Categoria");
+        grid.addColumn("destiny").setAutoWidth(true).setHeader("Marca");
+        grid.addColumn("activities").setAutoWidth(true).setHeader("Especificaciones");
+        grid.addColumn("price").setAutoWidth(true).setHeader("Precio");
+        
+        grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
 
         // when a row is selected or deselected, populate form
         grid.asSingleSelect().addValueChangeListener(event -> {
@@ -81,16 +88,58 @@ public class PackagesView extends Div implements BeforeEnterObserver {
               
               UI.getCurrent().navigate(String.format(PACKAGEMODEL_EDIT_ROUTE_TEMPLATE, event.getValue().getPackageID()));
             	
-            	namePackage.setValue(event.getValue().getNamePackage());
-            	packageID.setValue(event.getValue().getPackageID().toString());
+            	//namePackage.setValue(event.getValue().getNamePackage());
+            	//packageID.setValue(event.getValue().getPackageID().toString());
             	
             } else {
                 clearForm();
-                UI.getCurrent().navigate(PackagesView.class);
+                UI.getCurrent().navigate(ProductosView.class);
             }
             
         });
         
+        GridContextMenu<PackageModel> menu = grid.addContextMenu();
+        
+        
+        GridMenuItem<PackageModel> comprar = menu.addItem("Agregar al carrito de compra", event -> {
+        	
+        });
+        menu.add(new Hr());
+        GridMenuItem<PackageModel> delete = menu.addItem("Eliminar", event -> {
+        	if (event != null && event.getItem() != null) {
+        		PackageModel prodEliminar = event.getItem().get();        	
+        		ConfirmDialog dialog = new ConfirmDialog();
+                dialog.setHeader("¿Eliminar \'"+prodEliminar.getNamePackage() + "("+prodEliminar.getDestiny()+")\'?");
+                dialog.setText("¿Estás seguro de que deseas eliminar de forma permanente este producto?");
+
+                dialog.setCancelable(true);
+
+                dialog.setConfirmText("Eliminar");
+                dialog.setCancelText("Cancelar");
+                dialog.setConfirmButtonTheme("error primary");
+
+                dialog.addConfirmListener(eventDialog -> {
+                	try {
+    					boolean eliminado = db.eliminarPaquetes(prodEliminar.getPackageID());
+    							if(eliminado) {
+            						Notification.show("Producto eliminado satisfactoriamente...");
+            		                refreshGrid();
+            		                consultarProductos();
+            		                UI.getCurrent().navigate(ProductosView.class);
+            					}else {
+            						Notification.show("Ocurrio un problema al eliminar el producto");
+            					}
+    					}	catch (IOException e1) {
+        					Notification.show("No se pudo eliminar el producto, favor revisa tu conexion a internet.");
+        					e1.printStackTrace();	
+    					}
+                //controlador.eliminarProducto(prodEliminar);
+                });
+                dialog.open();
+        	}
+        });
+        delete.addComponentAsFirst(createIcon(VaadinIcon.TRASH));
+        comprar.addComponentAsFirst(createIcon(VaadinIcon.SHOP));
         consultarProductos();
         
 
@@ -105,8 +154,8 @@ public class PackagesView extends Div implements BeforeEnterObserver {
                     this.packageModel = new PackageModel();
                     this.packageModel.setNamePackage(namePackage.getValue());
                     this.packageModel.setDestiny(destiny.getValue());
-                    this.packageModel.setHotel(hotel.getValue());
                     this.packageModel.setActivities(activities.getValue());
+                    this.packageModel.setPrice(Integer.parseInt(price.getValue()));
                     
                     if(this.packageModel.getNamePackage()==null) {
                     	Notification.show("Para agregar un registro del paquete el campo nombre es requerido, favor digitar un valor valido");
@@ -120,7 +169,7 @@ public class PackagesView extends Div implements BeforeEnterObserver {
                 						clearForm();
                 		                refreshGrid();
                 		                consultarProductos();
-                		                UI.getCurrent().navigate(PackagesView.class);
+                		                UI.getCurrent().navigate(ProductosView.class);
                 					}else {
                 						Notification.show("Ficha del cliente no pudo ser creada, favor ingresar datos correctos");
                 					}
@@ -134,8 +183,8 @@ public class PackagesView extends Div implements BeforeEnterObserver {
         			//ACTUALIZACION
                 	this.packageModel.setNamePackage(namePackage.getValue());
                     this.packageModel.setDestiny(destiny.getValue());
-                    this.packageModel.setHotel(hotel.getValue());
                     this.packageModel.setActivities(activities.getValue());
+                    this.packageModel.setPrice(Integer.parseInt(price.getValue()));
                     
                     if(this.packageModel.getNamePackage()==null) {
                     	Notification.show("El nombre es requerido, favor digitar un valor valido");
@@ -148,7 +197,7 @@ public class PackagesView extends Div implements BeforeEnterObserver {
 	    						clearForm();
 	    		                refreshGrid();
 	    		                Notification.show("Ficha del cliente fue actualizada satisfactoriamente...");
-	    		                UI.getCurrent().navigate(PackagesView.class);
+	    		                UI.getCurrent().navigate(ProductosView.class);
 	    					}else {
 	    						Notification.show("Ficha del cliente no pudo ser actualizada, favor ingresar datos correctos");
 	    					}
@@ -182,13 +231,23 @@ public class PackagesView extends Div implements BeforeEnterObserver {
 			Notification.show("No se puedieron cargar los paquetes.");
 		}
 	}
+	
+	private Component createIcon(VaadinIcon vaadinIcon) {
+        Icon icon = vaadinIcon.create();
+        icon.getStyle().set("color", "var(--lumo-secondary-text-color)")
+                .set("margin-inline-end", "var(--lumo-space-s")
+                .set("padding", "var(--lumo-space-xs");
+        return icon;
+    }
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         Optional<Long> packageModelId = event.getRouteParameters().get(PACKAGEMODEL_ID).map(Long::parseLong);
         if (packageModelId.isPresent()) {
+        	Long ID = packageModelId.get();
+        	Integer idInteger = ID != null ? ID.intValue() : null;
         	for(PackageModel packageModel : models) {
-        		if(packageModel.getPackageID() == packageModelId.get()) {
+        		if(packageModel.getPackageID() == idInteger) {
         			populateForm(packageModel);
         			break;
         		}
@@ -207,11 +266,11 @@ public class PackagesView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(editorDiv);
 
         FormLayout formLayout = new FormLayout();
-        namePackage = new TextField("Nombre del Paquete");
-        destiny = new TextField("Destino");
-        hotel = new TextField("Hotel");
-        activities = new TextField("Actividades");
-        formLayout.add(namePackage, destiny, hotel, activities);
+        namePackage = new TextField("Categoria");
+        destiny = new TextField("Marca");
+        activities = new TextField("Especificaciones");
+        price = new TextField("Precio");
+        formLayout.add(namePackage, destiny, activities, price);
 
         editorDiv.add(formLayout);
         createButtonLayout(editorLayoutDiv);
@@ -243,20 +302,20 @@ public class PackagesView extends Div implements BeforeEnterObserver {
     private void clearForm() {
         populateForm(null);
     }
-
+    
+    
     private void populateForm(PackageModel value) {
     	this.packageModel = value;
     	if(value == null) {
             namePackage.setValue("");
             destiny.setValue("");
-            hotel.setValue("");
             activities.setValue("");
+            price.setValue("");
     	}else {	
     		namePackage.setValue(value.getNamePackage());
     		destiny.setValue(value.getDestiny());
-    		hotel.setValue(value.getHotel());
     		activities.setValue(value.getActivities());
-
+    		price.setValue(value.getPrice().toString());
     	}
 
     }
