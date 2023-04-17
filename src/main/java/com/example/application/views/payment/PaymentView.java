@@ -8,7 +8,7 @@ import java.util.List;
 import com.example.application.data.entity.PaymentModel;
 import com.example.application.data.entity.ReservaModel;
 import com.example.application.data.entity.ReservasResponse;
-import com.example.application.data.service.DatabaseServiceImplement;
+import com.example.application.data.service.DatabaseRepositoryImpl;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Html;
@@ -48,14 +48,14 @@ public class PaymentView extends Div {
     private Span status;
     
     
-    private DatabaseServiceImplement db;
+    private DatabaseRepositoryImpl db;
     
 
     public PaymentView() {
     	
     	status = new Span();
         status.setVisible(false);
-        db = DatabaseServiceImplement.getInstance();
+        db = DatabaseRepositoryImpl.getInstance();
         
         try {
         	ReservasResponse reservas = db.listarReserva();

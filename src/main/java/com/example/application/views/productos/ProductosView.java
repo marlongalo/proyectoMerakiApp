@@ -1,7 +1,8 @@
 package com.example.application.views.productos;
 import com.example.application.data.entity.PackageModel;
 import com.example.application.data.entity.PaqueteResponse;
-import com.example.application.data.service.DatabaseServiceImplement;
+import com.example.application.data.entity.ProductoCarrito;
+import com.example.application.data.service.DatabaseRepositoryImpl;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -46,7 +47,7 @@ public class ProductosView extends Div implements BeforeEnterObserver {
 
     private TextField namePackage;
     private TextField destiny;
-    //private TextField hotel;
+    private TextField duration;
     private TextField activities;
     private TextField price;
 
@@ -55,7 +56,7 @@ public class ProductosView extends Div implements BeforeEnterObserver {
 
     private PackageModel packageModel;
     
-    private DatabaseServiceImplement db;
+    private DatabaseRepositoryImpl db;
     private List<PackageModel> models;
 
 
@@ -63,7 +64,7 @@ public class ProductosView extends Div implements BeforeEnterObserver {
     	
         addClassNames("packages-view");
         
-        db = DatabaseServiceImplement.getInstance();
+        db = DatabaseRepositoryImpl.getInstance();
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
 
@@ -101,9 +102,23 @@ public class ProductosView extends Div implements BeforeEnterObserver {
         GridContextMenu<PackageModel> menu = grid.addContextMenu();
         
         
-        GridMenuItem<PackageModel> comprar = menu.addItem("Agregar al carrito de compra", event -> {
+        GridMenuItem<PackageModel> comprar = menu.addItem("Agregar al Carrito", event -> {
+        	if (event != null && event.getItem() != null) {
+        		PackageModel prodAgregar = event.getItem().get();
+        	
+        		PackageModel productoCarrito = new PackageModel();
+        		productoCarrito.setPackageID(prodAgregar.getPackageID());
+        		productoCarrito.setDuration(1);
+    			//agregarProductoCarrito(productoCarrito);
+        	}
         	
         });
+        
+       // GridMenuItem<PackageModel> generarReporte = menu.addItem("Generar Reporte PDF", event -> {
+        //	Notification.show("Generando reporte PDF...");
+    	//	generarReporte();
+        	
+      //  });
         menu.add(new Hr());
         GridMenuItem<PackageModel> delete = menu.addItem("Eliminar", event -> {
         	if (event != null && event.getItem() != null) {

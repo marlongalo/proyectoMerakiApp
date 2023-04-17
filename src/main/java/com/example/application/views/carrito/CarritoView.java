@@ -3,7 +3,7 @@ import com.example.application.data.entity.ProductoCarrito;
 import com.example.application.data.entity.ProductoCarritoResponse;
 import java.util.ArrayList;
 import java.util.Collection;
-import com.example.application.data.service.DatabaseServiceImplement;
+import com.example.application.data.service.DatabaseRepositoryImpl;
 import com.example.application.views.MainLayout;
 import com.example.application.data.entity.ClientModel;
 import com.example.application.data.entity.ClientResponse;
@@ -50,6 +50,9 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.swing.JOptionPane;
+
 import java.io.IOException;
 
 
@@ -62,12 +65,14 @@ public class CarritoView extends Div {
     private static final Set<String> countries = new LinkedHashSet<>();
 	private static final long serialVersionUID = 1L;
 	private ComboBox<String> clientCombo = new ComboBox<>();
+	//private ComboBox<String> clientCombo1 = new ComboBox<>();
 	Collection<ClientModel> collectionClientes;
 	private ClientModel clienteSelected;
-    private Hr dividerHr = new Hr();
-    private Button calculate = new Button("Calcular");
+  //  private Hr dividerHr = new Hr();
+  //  private Button calculate = new Button("Calcular");
 	private List<String> itemsClientes = new ArrayList<>();
-    private DatabaseServiceImplement db;
+	//private List<String> itemsClientes1 = new ArrayList<>();
+    private DatabaseRepositoryImpl db;
     private List<ProductoCarrito> items;
     private String value;
 
@@ -122,7 +127,7 @@ public class CarritoView extends Div {
     public CarritoView() {
         addClassNames("carrito-view");
         addClassNames(Display.FLEX, FlexDirection.COLUMN, Height.FULL);
-        db = DatabaseServiceImplement.getInstance();
+        db = DatabaseRepositoryImpl.getInstance();
 
         Main content = new Main();
         content.addClassNames(Display.GRID, Gap.XLARGE, AlignItems.START, JustifyContent.CENTER, MaxWidth.SCREEN_MEDIUM,
@@ -169,7 +174,9 @@ public class CarritoView extends Div {
         	collectionClientes = paquetes.getItems();
         	
         	collectionClientes.forEach( (cliente) -> {
-        		itemsClientes.add(cliente.getName());
+           		itemsClientes.add(cliente.getName());
+        		itemsClientes.add(cliente.getAddress());
+        		
           	});
 
 		} catch (Exception e) {
@@ -190,8 +197,8 @@ public class CarritoView extends Div {
         	});
         	
         });
-        
-        /*
+        */
+       
         TextField name = new TextField("Nombre");
         name.setRequiredIndicatorVisible(true);
         name.setPattern("[\\p{L} \\-]+");
@@ -202,15 +209,43 @@ public class CarritoView extends Div {
         email.setRequiredIndicatorVisible(true);
         email.addClassNames(Margin.Bottom.SMALL);
 
+        /*
         TextField phone = new TextField("Número de teléfono");
         phone.setRequiredIndicatorVisible(true);
         phone.setPattern("[\\d \\-\\+]+");
         phone.addClassNames(Margin.Bottom.SMALL);
+        phone.setValue("");
 */
+        
+        clientCombo.addValueChangeListener(event -> {
+            String selectedValue = event.getValue();
+            TextField phone = new TextField("Número de teléfono");
+            phone.setRequiredIndicatorVisible(true);
+            phone.setPattern("[\\d \\-\\+]+");
+            phone.addClassNames(Margin.Bottom.SMALL);
+            phone.setValue(selectedValue);
+            personalDetails.add(phone);
+        });
+
+        
+/*
+        clientCombo.addAttachListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		try
+        		{
+        			clientCombo.add(itemsClientes);
+        		}catch(Exception ex)
+        		{
+        			JOptionPane.showMessageDialog(null, ex);
+        		}
+        	}
+        });
+        
+      */  
         Checkbox rememberDetails = new Checkbox("Recordar datos personales para la próxima vez");
         rememberDetails.addClassNames(Margin.Top.SMALL);
 
-        personalDetails.add(stepOne, header, createFormLayout() ,  rememberDetails);
+        personalDetails.add(stepOne, header, createFormLayout());
         return personalDetails;
     }
 
@@ -351,7 +386,7 @@ public class CarritoView extends Div {
         	ProductoCarritoResponse respuesta = db.consultarProductoCarrito();
         	
         	for (ProductoCarrito productoCarrito : respuesta.getItems()) {
-        		ul.add(createListItem(productoCarrito.getProducto(), productoCarrito.getDescripcion(), "Cantidad: "+productoCarrito.getCantidad(),"L "+productoCarrito.getTotal()));
+        		ul.add(createListItem(productoCarrito.getProducto(), productoCarrito.getDescripcion(), "Cantidad: "+productoCarrito.getCantidad() + " ("+productoCarrito.getPrice()+"c/u)" ,"L "+productoCarrito.getTotal()));
         	}
         }	catch (IOException e1) {
 			Notification.show("No se pudo consultar el carrito, favor revisa tu conexion a internet.");
@@ -397,36 +432,25 @@ public class CarritoView extends Div {
     	clientCombo.setPlaceholder("Clientes");
     	clientCombo.setAllowedCharPattern("[\\+\\d]");
     	clientCombo.setItems(itemsClientes);
-    	//PRUEBA
+
+    	//PRUEBAS
     	
-        TextField phone = new TextField("Número de teléfono");
-        phone.setRequiredIndicatorVisible(true);
-        phone.setPattern("[\\d \\-\\+]+");
-        phone.addClassNames(Margin.Bottom.SMALL);
-
-
-        
-        if (phone ==  null) {
-        	phone.setValue("");
-        }else {
-        	phone.setValue("Hola");
-        }
-        
-        
-        
-    	//FIN PRUEBA 
-    	//clientCombo.addCustomValueSetListener(e -> {
-    	//	clientCombo.setValue(e.getDetail());
-    	//});
-        formLayout.add(clientCombo, phone); // Include the field you will need.
+    	
+    	
+    	
+    	//FIN PRUEBAS
+    	
+    	
+    	
+        formLayout.add(clientCombo); // Include the field you will need.
        // formLayout.setResponsiveSteps(
                // new ResponsiveStep("1", 1),
              //   new ResponsiveStep("500px", 0));
         formLayout.setColspan(clientCombo, 2);
-        formLayout.setColspan(phone, 2);
         formLayout.addClassNames(FontSize.SMALL, TextColor.SECONDARY);
     	return formLayout;
     }
-	
+
+		
    
 }

@@ -2,7 +2,7 @@ package com.example.application.views.client;
 
 import com.example.application.data.entity.ClientModel;
 import com.example.application.data.entity.ClientResponse;
-import com.example.application.data.service.DatabaseServiceImplement;
+import com.example.application.data.service.DatabaseRepositoryImpl;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -47,14 +47,14 @@ public class ClientView extends Div implements BeforeEnterObserver {
 
     private ClientModel clientModel;
     
-    private DatabaseServiceImplement db;
+    private DatabaseRepositoryImpl db;
     private List<ClientModel> clients;//cambio 1
 
     public ClientView() {
         
         addClassNames("client-view");
         
-        db = DatabaseServiceImplement.getInstance();
+        db = DatabaseRepositoryImpl.getInstance();
 
         // Create UI
         SplitLayout splitLayout = new SplitLayout();

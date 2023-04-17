@@ -33,24 +33,9 @@ public class DatabaseClient {
 		
 	}
 	
-	public DatabaseServiceClient getDatabaseServiceClient() {
-		return retrofit.create(DatabaseServiceClient.class);
+	public DatabaseRepository getDatabaseRepository() {
+		return retrofit.create(DatabaseRepository.class);
 	}
 	
-	public DatabaseServicePaquetes getDatabaseServicePaquetes() {
-		return retrofit.create(DatabaseServicePaquetes.class);
-	}
-	
-	public DatabaseServiceReservas getDatabaseServiceReserva() {
-		return retrofit.create(DatabaseServiceReservas.class);
-	}
-	
-	public DatabaseServicePayment getDatabaseServicePayment() {
-		return retrofit.create(DatabaseServicePayment.class);
-	}
-	
-	public DatabaseServiceCarrito getDatabaseServiceCarrito() {
-		return retrofit.create(DatabaseServiceCarrito.class);
-	}
 
 }

@@ -15,21 +15,21 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 
-public class DatabaseServiceImplement {
+public class DatabaseRepositoryImpl {
 	
-	private static DatabaseServiceImplement INSTANCE = null;
+	private static DatabaseRepositoryImpl INSTANCE = null;
 	private DatabaseClient client;
 	private DatabaseClient models;
 
-    private DatabaseServiceImplement(){
+    private DatabaseRepositoryImpl(){
     	client = new DatabaseClient();
     }
 
-    public static DatabaseServiceImplement getInstance() {
+    public static DatabaseRepositoryImpl getInstance() {
         if (INSTANCE == null) {
-        	synchronized (DatabaseServiceImplement.class) {
+        	synchronized (DatabaseRepositoryImpl.class) {
         		if (INSTANCE == null) { 
-                    INSTANCE = new DatabaseServiceImplement();
+                    INSTANCE = new DatabaseRepositoryImpl();
                 }
 			}
         }
@@ -40,7 +40,7 @@ public class DatabaseServiceImplement {
     
     //OPERACIONES DE LA VISTA PAQUETES
     public PaqueteResponse listarPaquetes() throws IOException {
-    	Call<PaqueteResponse> paquetesCall = client.getDatabaseServicePaquetes().listarPaquetes();
+    	Call<PaqueteResponse> paquetesCall = client.getDatabaseRepository().listarPaquetes();
     	
     	Response<PaqueteResponse> response = paquetesCall.execute();
     	if(response.isSuccessful()) {
@@ -52,21 +52,21 @@ public class DatabaseServiceImplement {
     
     
     public boolean crearPaquetes(PackageModel nuevo) throws IOException {
-    	Call<ResponseBody> call = client.getDatabaseServicePaquetes().crearPaquetes(nuevo);
+    	Call<ResponseBody> call = client.getDatabaseRepository().crearPaquetes(nuevo);
     	Response<ResponseBody> response = call.execute();
     	return response.isSuccessful();
     }
     
     
     public boolean actualizarPaquetes(PackageModel actualizar) throws IOException {
-    	Call<ResponseBody> call = client.getDatabaseServicePaquetes().actualizarPaquetes(actualizar);
+    	Call<ResponseBody> call = client.getDatabaseRepository().actualizarPaquetes(actualizar);
     	Response<ResponseBody> response = call.execute();
     	return response.isSuccessful();
     }
     
     
     public boolean eliminarPaquetes(Integer PackageID) throws IOException {
-    	Call<ResponseBody> call = client.getDatabaseServicePaquetes().eliminarPaquetes(PackageID);
+    	Call<ResponseBody> call = client.getDatabaseRepository().eliminarPaquetes(PackageID);
     	Response<ResponseBody> response = call.execute();
     	return response.isSuccessful();
     }
@@ -76,7 +76,7 @@ public class DatabaseServiceImplement {
     //OPERACIONES DE LA VISTA CLIENTE
     
     public ClientResponse listarClientes() throws IOException {
-    	Call<ClientResponse> paquetesCall = client.getDatabaseServiceClient().listarClientes();
+    	Call<ClientResponse> paquetesCall = client.getDatabaseRepository().listarClientes();
     	
     	Response<ClientResponse> response = paquetesCall.execute();
     	if(response.isSuccessful()) {
@@ -89,20 +89,20 @@ public class DatabaseServiceImplement {
 
     
     public boolean crearClientes(ClientModel nuevo) throws IOException {
-    	Call<ResponseBody> call = client.getDatabaseServiceClient().crearClientes(nuevo);
+    	Call<ResponseBody> call = client.getDatabaseRepository().crearClientes(nuevo);
     	Response<ResponseBody> response = call.execute();
     	return response.isSuccessful();
     }
     
     
     public boolean actualizarClientes(ClientModel actualizar) throws IOException {
-    	Call<ResponseBody> call = client.getDatabaseServiceClient().actualizarClientes(actualizar);
+    	Call<ResponseBody> call = client.getDatabaseRepository().actualizarClientes(actualizar);
     	Response<ResponseBody> response = call.execute();
     	return response.isSuccessful();
     }
 
     public boolean crearReserva( ReservaModel nuevaReserva ) throws IOException {
-    	Call<ResponseBody> reservaCall = client.getDatabaseServiceReserva().crearReserva(nuevaReserva);
+    	Call<ResponseBody> reservaCall = client.getDatabaseRepository().crearReserva(nuevaReserva);
     	Response<ResponseBody> response = reservaCall.execute();
     	
     	return response.isSuccessful();
@@ -110,7 +110,7 @@ public class DatabaseServiceImplement {
     }
     
     public boolean actualizarReserva( ReservaModel nuevaReserva ) throws IOException {
-    	Call<ResponseBody> reservaCall = client.getDatabaseServiceReserva().actualizarReserva(nuevaReserva);
+    	Call<ResponseBody> reservaCall = client.getDatabaseRepository().actualizarReserva(nuevaReserva);
     	Response<ResponseBody> response = reservaCall.execute();
     	
     	return response.isSuccessful();
@@ -119,7 +119,7 @@ public class DatabaseServiceImplement {
     
     
     public ReservasResponse listarReserva() throws IOException {
-    	Call<ReservasResponse> reservaCall = client.getDatabaseServiceReserva().listarReservasPendientes();
+    	Call<ReservasResponse> reservaCall = client.getDatabaseRepository().listarReservasPendientes();
     	Response<ReservasResponse> response = reservaCall.execute();
     	
     	if(response.isSuccessful()) {
@@ -131,7 +131,7 @@ public class DatabaseServiceImplement {
     }
     
     public boolean crearPayment( PaymentModel nuevaPayment ) throws IOException {
-    	Call<ResponseBody> paymentCall = client.getDatabaseServicePayment().crearPayment(nuevaPayment);
+    	Call<ResponseBody> paymentCall = client.getDatabaseRepository().crearPayment(nuevaPayment);
     	Response<ResponseBody> response = paymentCall.execute();
     	
     	return response.isSuccessful();
@@ -142,7 +142,7 @@ public class DatabaseServiceImplement {
     //OPERACIONES DE LA PANTALLA CARRITO
     
     public ProductoCarritoResponse consultarProductoCarrito() throws IOException {
-    	Call<ProductoCarritoResponse> call = client.getDatabaseServiceCarrito().listarProductosCarrito();
+    	Call<ProductoCarritoResponse> call = client.getDatabaseRepository().listarProductosCarrito();
     	
     	Response<ProductoCarritoResponse> response = call.execute();
     	if(response.isSuccessful()) {
