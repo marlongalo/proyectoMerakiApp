@@ -4,6 +4,7 @@ import com.example.application.data.entity.ClientResponse;
 import com.example.application.data.entity.PackageModel;
 import com.example.application.data.entity.PaqueteResponse;
 import com.example.application.data.entity.PaymentModel;
+import com.example.application.data.entity.ProductoCarrito;
 import com.example.application.data.entity.ProductoCarritoResponse;
 import com.example.application.data.entity.ReservaModel;
 import com.example.application.data.entity.ReservasResponse;
@@ -121,6 +122,14 @@ public interface DatabaseRepository {
 	})
 	@GET("turiApp/carrito")
 	Call<ProductoCarritoResponse> listarProductosCarrito();
+	
+	
+	@Headers({
+	    "Accept: application/json",
+	    "User-Agent: Retrofit-Sample-App"
+	})
+	@POST("turiApp/carrito")
+	Call<ResponseBody> agregarProductoCarrito(@Body ProductoCarrito nuevo);
 }
 
 

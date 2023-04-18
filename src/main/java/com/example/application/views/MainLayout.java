@@ -2,7 +2,7 @@ package com.example.application.views;
 
 import com.example.application.components.appnav.AppNav;
 import com.example.application.components.appnav.AppNavItem;
-import com.example.application.views.carrito.CarritoView;
+import com.example.application.views.carrito.CarritoPagoView;
 import com.example.application.views.client.ClientView;
 import com.example.application.views.payment.PaymentView;
 import com.example.application.views.productos.ProductosView;
@@ -56,7 +56,7 @@ public class MainLayout extends AppLayout {
         // For documentation, visit https://github.com/vaadin/vcf-nav#readme
         AppNav nav = new AppNav();
 
-        nav.addItem(new AppNavItem("Carrito", CarritoView.class, "la la-user"));
+        nav.addItem(new AppNavItem("Carrito", CarritoPagoView.class, "la la-user"));
 		//nav.addItem(new AppNavItem("Carrito", CarritoView.class, LineAwesomeIcon.SHOPPING_CART_SOLID.create()));
         nav.addItem(new AppNavItem("Pago en linea", PaymentView.class, "la la-map-marker"));
         nav.addItem(new AppNavItem("Utiles Escolares", ProductosView.class, "la la-columns"));

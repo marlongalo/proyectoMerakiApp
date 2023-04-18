@@ -1,4 +1,6 @@
 package com.example.application.views.productos;
+import com.example.application.controller.ProductosInteractor;
+import com.example.application.controller.ProductosInteractorImpl;
 import com.example.application.data.entity.PackageModel;
 import com.example.application.data.entity.PaqueteResponse;
 import com.example.application.data.entity.ProductoCarrito;
@@ -38,7 +40,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 @SuppressWarnings("serial")
 @PageTitle("Meraki Home, Tu tienda exclusiva de materiales para Escolar y Oficina")
 @Route(value = "productos/:packageModelID?/:action?(edit)", layout = MainLayout.class)
-public class ProductosView extends Div implements BeforeEnterObserver {
+public class ProductosView extends Div implements BeforeEnterObserver, ProductosViewModel {//aca se implementa la clase de la interfaz de la vista
 
     private final String PACKAGEMODEL_ID = "packageModelID";
     private final String PACKAGEMODEL_EDIT_ROUTE_TEMPLATE = "productos/%s/edit";
@@ -47,7 +49,7 @@ public class ProductosView extends Div implements BeforeEnterObserver {
 
     private TextField namePackage;
     private TextField destiny;
-    private TextField duration;
+    //private TextField duration;
     private TextField activities;
     private TextField price;
 
@@ -56,7 +58,7 @@ public class ProductosView extends Div implements BeforeEnterObserver {
 
     private PackageModel packageModel;
     
-    private DatabaseRepositoryImpl db;
+    private ProductosInteractor controlador;//la vista esta hablando directamente a la DB lo cual es incorrecto, debera de usar el controlador
     private List<PackageModel> models;
 
 
@@ -64,7 +66,8 @@ public class ProductosView extends Div implements BeforeEnterObserver {
     	
         addClassNames("packages-view");
         
-        db = DatabaseRepositoryImpl.getInstance();
+        controlador = new ProductosInteractorImpl(this);
+        
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
 
@@ -105,13 +108,12 @@ public class ProductosView extends Div implements BeforeEnterObserver {
         GridMenuItem<PackageModel> comprar = menu.addItem("Agregar al Carrito", event -> {
         	if (event != null && event.getItem() != null) {
         		PackageModel prodAgregar = event.getItem().get();
-        	
-        		PackageModel productoCarrito = new PackageModel();
-        		productoCarrito.setPackageID(prodAgregar.getPackageID());
-        		productoCarrito.setDuration(1);
-    			//agregarProductoCarrito(productoCarrito);
-        	}
-        	
+        		
+        		ProductoCarrito productoCarrito = new ProductoCarrito();
+        		productoCarrito.setIdproducto(prodAgregar.getPackageID());
+        		productoCarrito.setCantidad(1);
+            	controlador.agregarProductoCarrito(productoCarrito);
+        	}        	
         });
         
        // GridMenuItem<PackageModel> generarReporte = menu.addItem("Generar Reporte PDF", event -> {
@@ -134,22 +136,10 @@ public class ProductosView extends Div implements BeforeEnterObserver {
                 dialog.setConfirmButtonTheme("error primary");
 
                 dialog.addConfirmListener(eventDialog -> {
-                	try {
-    					boolean eliminado = db.eliminarPaquetes(prodEliminar.getPackageID());
-    							if(eliminado) {
-            						Notification.show("Producto eliminado satisfactoriamente...");
-            		                refreshGrid();
-            		                consultarProductos();
-            		                UI.getCurrent().navigate(ProductosView.class);
-            					}else {
-            						Notification.show("Ocurrio un problema al eliminar el producto");
-            					}
-    					}	catch (IOException e1) {
-        					Notification.show("No se pudo eliminar el producto, favor revisa tu conexion a internet.");
-        					e1.printStackTrace();	
-    					}
-                //controlador.eliminarProducto(prodEliminar);
+                	controlador.eliminarProductos(prodEliminar);
+                //
                 });
+                
                 dialog.open();
         	}
         });
@@ -177,22 +167,7 @@ public class ProductosView extends Div implements BeforeEnterObserver {
         			}else if(this.packageModel.getDestiny()==null || this.packageModel.getDestiny().isEmpty()){
         				Notification.show("Para agregar un registro el campo telefono es requerido, favor digitar un valor valido");
         			}else {
-        				try {
-        					boolean creado = db.crearPaquetes(packageModel);
-        							if(creado) {
-                						Notification.show("Ficha del Cliente creado satisfactoriamente...");
-                						clearForm();
-                		                refreshGrid();
-                		                consultarProductos();
-                		                UI.getCurrent().navigate(ProductosView.class);
-                					}else {
-                						Notification.show("Ficha del cliente no pudo ser creada, favor ingresar datos correctos");
-                					}
-        					}	catch (IOException e1) {
-	        					Notification.show("No se pudo crear el cliente favor revisa tu conexion a internet.");
-	        					e1.printStackTrace();	
-        					}
-
+        				controlador.crearProductos(packageModel);
         			}
                 }else {
         			//ACTUALIZACION
@@ -206,21 +181,7 @@ public class ProductosView extends Div implements BeforeEnterObserver {
         			}else if(this.packageModel.getDestiny()==null || this.packageModel.getDestiny().isEmpty()) {
         				Notification.show("El nombre es requerido, favor digitar un valor valido");
         			}else {
-        			try {
-    					boolean actualizado = db.actualizarPaquetes(packageModel);
-	    					if(actualizado) {	    						
-	    						clearForm();
-	    		                refreshGrid();
-	    		                Notification.show("Ficha del cliente fue actualizada satisfactoriamente...");
-	    		                UI.getCurrent().navigate(ProductosView.class);
-	    					}else {
-	    						Notification.show("Ficha del cliente no pudo ser actualizada, favor ingresar datos correctos");
-	    					}
-	    					
-	    				}   catch (IOException e1) {
-	        					Notification.show("No se pudo actualizar la ficha del cliente favor revisa tu conexion a internet.");
-	        					e1.printStackTrace();
-    				}
+        				controlador.actualizarProductos(packageModel);
         		}
     		}
                 
@@ -235,16 +196,7 @@ public class ProductosView extends Div implements BeforeEnterObserver {
     }
 
 	private void consultarProductos() {
-		try {
-        	PaqueteResponse paquetes = db.listarPaquetes();	
-        	models = paquetes.getPaquetes();
-        	Collection<PackageModel> collectionPaquetes = paquetes.getPaquetes();
-        	grid.setItems(collectionPaquetes);//TODO: CAMBIO PENDIENTE
-        	
-		} catch (Exception e) {
-			// TODO: handle exception
-			Notification.show("No se puedieron cargar los paquetes.");
-		}
+		controlador.consultarProductos();
 	}
 	
 	private Component createIcon(VaadinIcon vaadinIcon) {
@@ -334,4 +286,46 @@ public class ProductosView extends Div implements BeforeEnterObserver {
     	}
 
     }
+    
+    private void actualizarPantalla() {
+    	clearForm();
+        refreshGrid();
+        consultarProductos();
+        UI.getCurrent().navigate(ProductosView.class);
+    }
+
+	@Override
+	public void refrescarGridProductos(List<PackageModel> models) {
+		Collection<PackageModel> collectionPaquetes = models;
+    	grid.setItems(collectionPaquetes);//TODO: CAMBIO PENDIENTE
+    	this.models = models;
+	}
+
+	@Override
+	public void mostrarMensajeCreacionProducto(PackageModel nuevo, String mensaje) {
+		//Notification.show("Ficha del Cliente creado satisfactoriamente...");//se reemplaza por lo siguiente
+		Notification.show(String.format(mensaje, nuevo.getNamePackage()));
+		actualizarPantalla();
+		
+	}
+
+	@Override
+	public void mostrarMensajeActualizacionProducto(PackageModel nuevo, String mensaje) {
+        //Notification.show("Ficha del cliente fue actualizada satisfactoriamente...");
+		Notification.show(String.format(mensaje, nuevo.getNamePackage()));
+		actualizarPantalla();
+	}
+
+	@Override
+	public void mostrarMensajeEliminacionProducto(PackageModel nuevo, String mensaje) {
+		//Notification.show("Producto eliminado satisfactoriamente...");
+		Notification.show(String.format(mensaje, nuevo.getNamePackage()));
+		actualizarPantalla();
+	}
+
+	@Override
+	public void mostrarMensajeProductoAgregadoCarrito(String mensaje) {
+		// TODO Auto-generated method stub
+		Notification.show(mensaje);
+	}
 }

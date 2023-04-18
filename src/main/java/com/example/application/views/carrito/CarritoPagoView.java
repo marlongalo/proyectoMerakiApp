@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import com.example.application.data.service.DatabaseRepositoryImpl;
 import com.example.application.views.MainLayout;
+import com.example.application.controller.CarritoPagoInteractor;
+import com.example.application.controller.CarritoPagoInteractorImpl;
 import com.example.application.data.entity.ClientModel;
 import com.example.application.data.entity.ClientResponse;
 import com.vaadin.flow.component.button.Button;
@@ -59,8 +61,8 @@ import java.io.IOException;
 @PageTitle("Carrito")
 @Route(value = "carrito", layout = MainLayout.class)
 @RouteAlias(value = "", layout = MainLayout.class)
-public class CarritoView extends Div {
-	private TextField phone;
+public class CarritoPagoView extends Div implements CarritoPagoViewModel{
+	//private TextField phone;
     private static final Set<String> states = new LinkedHashSet<>();
     private static final Set<String> countries = new LinkedHashSet<>();
 	private static final long serialVersionUID = 1L;
@@ -68,14 +70,15 @@ public class CarritoView extends Div {
 	//private ComboBox<String> clientCombo1 = new ComboBox<>();
 	Collection<ClientModel> collectionClientes;
 	private ClientModel clienteSelected;
-  //  private Hr dividerHr = new Hr();
+   // private Hr dividerHr = new Hr();
   //  private Button calculate = new Button("Calcular");
 	private List<String> itemsClientes = new ArrayList<>();
 	//private List<String> itemsClientes1 = new ArrayList<>();
-    private DatabaseRepositoryImpl db;
+    private CarritoPagoInteractor controlador;
     private List<ProductoCarrito> items;
-    private String value;
-
+    //private DatabaseServiceImplement db;
+    //private String value;
+    private Main content;
     
     static {
         states.addAll(Arrays.asList("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
@@ -124,18 +127,18 @@ public class CarritoView extends Div {
     }
 	
 	
-    public CarritoView() {
+    public CarritoPagoView() {
         addClassNames("carrito-view");
         addClassNames(Display.FLEX, FlexDirection.COLUMN, Height.FULL);
-        db = DatabaseRepositoryImpl.getInstance();
 
-        Main content = new Main();
+        controlador = new CarritoPagoInteractorImpl(this);
+
+        content = new Main();
         content.addClassNames(Display.GRID, Gap.XLARGE, AlignItems.START, JustifyContent.CENTER, MaxWidth.SCREEN_MEDIUM,
                 Margin.Horizontal.AUTO, Padding.Bottom.LARGE, Padding.Horizontal.LARGE);
-		
-        content.add(createAside());
         content.add(createCheckoutForm());
-        add(content);
+        controlador.consultarProductoCarrito(); 
+        controlador.listarClientes();
     }
 
     
@@ -168,7 +171,7 @@ public class CarritoView extends Div {
         H3 header = new H3("Detalles Personales");
         header.addClassNames(Margin.Bottom.MEDIUM, Margin.Top.SMALL, FontSize.XXLARGE);
         
-
+/*
         try {
         	ClientResponse paquetes = db.listarClientes();
         	collectionClientes = paquetes.getItems();
@@ -183,7 +186,7 @@ public class CarritoView extends Div {
 			// TODO: handle exception
 			Notification.show("No se pudieron cargar los clientes.");
 		}
-        
+  */      
         /*
         add(createFormLayout());       
         calculate.addClickListener(e -> {
@@ -366,7 +369,7 @@ public class CarritoView extends Div {
         return footer;
     }
 	
-	
+	/*
     private Aside createAside() {
         Aside aside = new Aside();
         aside.addClassNames(Background.CONTRAST_5, BoxSizing.BORDER, Padding.LARGE, BorderRadius.LARGE,
@@ -380,14 +383,10 @@ public class CarritoView extends Div {
         edit.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
         headerSection.add(header, edit);
 
-        UnorderedList ul = new UnorderedList();
-        ul.addClassNames(ListStyleType.NONE, Margin.NONE, Padding.NONE, Display.FLEX, FlexDirection.COLUMN, Gap.MEDIUM);
         try {
         	ProductoCarritoResponse respuesta = db.consultarProductoCarrito();
         	
-        	for (ProductoCarrito productoCarrito : respuesta.getItems()) {
-        		ul.add(createListItem(productoCarrito.getProducto(), productoCarrito.getDescripcion(), "Cantidad: "+productoCarrito.getCantidad() + " ("+productoCarrito.getPrice()+"c/u)" ,"L "+productoCarrito.getTotal()));
-        	}
+        	
         }	catch (IOException e1) {
 			Notification.show("No se pudo consultar el carrito, favor revisa tu conexion a internet.");
 			e1.printStackTrace();
@@ -397,7 +396,7 @@ public class CarritoView extends Div {
         aside.add(headerSection, ul);
         return aside;
     }
-    
+    */
 
     private ListItem createListItem(String producto, String descripcion, String cantidad, String total ) {
         ListItem item = new ListItem();
@@ -450,6 +449,60 @@ public class CarritoView extends Div {
         formLayout.addClassNames(FontSize.SMALL, TextColor.SECONDARY);
     	return formLayout;
     }
+
+
+	@Override
+	public void mostrarProductosEnCarrito(List<ProductoCarrito> producto) {
+		Aside aside = new Aside();
+        aside.addClassNames(Background.CONTRAST_5, BoxSizing.BORDER, Padding.LARGE, BorderRadius.LARGE,
+                Position.STICKY);
+        Header headerSection = new Header();
+        headerSection.addClassNames(Display.FLEX, AlignItems.CENTER, JustifyContent.BETWEEN, Margin.Bottom.MEDIUM);
+        H3 header = new H3(""
+        		+ "Lista de Productos");
+        header.addClassNames(Margin.NONE);
+        Button edit = new Button("Editar");
+        edit.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+        headerSection.add(header, edit);
+		UnorderedList ul = new UnorderedList();
+        ul.addClassNames(ListStyleType.NONE, Margin.NONE, Padding.NONE, Display.FLEX, FlexDirection.COLUMN, Gap.MEDIUM);
+		for (ProductoCarrito productoCarrito : producto) {
+    		ul.add(createListItem(productoCarrito.getProducto(), productoCarrito.getDescripcion(), 
+    				"Cantidad: "+productoCarrito.getCantidad() + " ("+productoCarrito.getPrice()+"c/u)" ,
+    				"L "+productoCarrito.getTotal()));
+    	}
+		aside.add(headerSection, ul);
+		content.add(aside);
+		add(content);
+	}
+
+
+	@Override
+	public void mostrarClientesEnCarrito(List<ClientModel> list) {
+		try {
+        	//ClientResponse paquetes = listarClientes();
+        	//collectionClientes = paquetes.getItems();
+        	
+        	collectionClientes.forEach( (cliente) -> {
+           		itemsClientes.add(cliente.getName());
+        		itemsClientes.add(cliente.getAddress());
+        		
+          	});
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			Notification.show("No se pudieron cargar los clientes.");
+		}
+		
+	}
+
+
+
+
+
+
+
+
 
 		
    

@@ -7,6 +7,7 @@ import com.example.application.data.entity.ClientResponse;
 import com.example.application.data.entity.PackageModel;
 import com.example.application.data.entity.PaqueteResponse;
 import com.example.application.data.entity.PaymentModel;
+import com.example.application.data.entity.ProductoCarrito;
 import com.example.application.data.entity.ProductoCarritoResponse;
 import com.example.application.data.entity.ReservaModel;
 import com.example.application.data.entity.ReservasResponse;
@@ -152,6 +153,12 @@ public class DatabaseRepositoryImpl {
     	}
     }
     
-    
+    public boolean agregarProductoCarrito(ProductoCarrito nuevo ) throws IOException {
+    	Call<ResponseBody> call = client.getDatabaseRepository().agregarProductoCarrito(nuevo);
+    	Response<ResponseBody> response = call.execute();
+    	
+    	return response.isSuccessful();
+    	
+    }
 
 }
