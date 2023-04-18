@@ -4,7 +4,9 @@ import com.example.application.controller.ProductosInteractorImpl;
 import com.example.application.data.entity.PackageModel;
 import com.example.application.data.entity.PaqueteResponse;
 import com.example.application.data.entity.ProductoCarrito;
+import com.example.application.data.entity.ProductosReport;
 import com.example.application.data.service.DatabaseRepositoryImpl;
+import com.example.application.data.service.ReportGenerator;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -33,7 +35,9 @@ import com.vaadin.flow.router.Route;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
@@ -115,12 +119,13 @@ public class ProductosView extends Div implements BeforeEnterObserver, Productos
             	controlador.agregarProductoCarrito(productoCarrito);
         	}        	
         });
-        
-       // GridMenuItem<PackageModel> generarReporte = menu.addItem("Generar Reporte PDF", event -> {
-        //	Notification.show("Generando reporte PDF...");
-    	//	generarReporte();
+        /*
+        GridMenuItem<PackageModel> generarReporte = menu.addItem("Generar Reporte PDF", event -> {
+        	Notification.show("Generando reporte PDF...");
+    		generarReporte();
         	
-      //  });
+        });
+        */
         menu.add(new Hr());
         GridMenuItem<PackageModel> delete = menu.addItem("Eliminar", event -> {
         	if (event != null && event.getItem() != null) {
@@ -145,6 +150,7 @@ public class ProductosView extends Div implements BeforeEnterObserver, Productos
         });
         delete.addComponentAsFirst(createIcon(VaadinIcon.TRASH));
         comprar.addComponentAsFirst(createIcon(VaadinIcon.SHOP));
+      //  generarReporte.addComponentAsFirst(createIcon(VaadinIcon.SHOP));
         consultarProductos();
         
 
@@ -194,7 +200,16 @@ public class ProductosView extends Div implements BeforeEnterObserver, Productos
             } 
         });
     }
-
+/*
+	private void generarReporte() {
+		ReportGenerator generador = new ReportGenerator();
+		ProductosReport datasource = new ProductosReport();
+		datasource.setProductos(models);
+		Map<String, Object> parameters = new HashMap<>();
+		generador.gererarReportePDF("reporteproductos", datasource, parameters);
+		//generador.generarReportePDF("reporteproductos", datasource, parameters );
+	}
+*/
 	private void consultarProductos() {
 		controlador.consultarProductos();
 	}

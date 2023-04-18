@@ -247,7 +247,6 @@ public class CarritoPagoView extends Div implements CarritoPagoViewModel{
       */  
         Checkbox rememberDetails = new Checkbox("Recordar datos personales para la próxima vez");
         rememberDetails.addClassNames(Margin.Top.SMALL);
-
         personalDetails.add(stepOne, header, createFormLayout());
         return personalDetails;
     }
@@ -480,13 +479,15 @@ public class CarritoPagoView extends Div implements CarritoPagoViewModel{
 	@Override
 	public void mostrarClientesEnCarrito(List<ClientModel> list) {
 		try {
-        	//ClientResponse paquetes = listarClientes();
-        	//collectionClientes = paquetes.getItems();
-        	
+      	
         	collectionClientes.forEach( (cliente) -> {
            		itemsClientes.add(cliente.getName());
         		itemsClientes.add(cliente.getAddress());
         		
+        		//PRUEBAS
+        		
+        		
+        		//FIN PRUEBAS
           	});
 
 		} catch (Exception e) {
