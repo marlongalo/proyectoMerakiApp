@@ -1,16 +1,26 @@
 package com.example.application.views.client;
 
 import com.example.application.data.entity.ClientModel;
+import com.example.application.data.entity.ClientReport;
 import com.example.application.data.entity.ClientResponse;
+import com.example.application.data.entity.PackageModel;
+import com.example.application.data.entity.ProductosReport;
 import com.example.application.data.service.DatabaseRepositoryImpl;
+import com.example.application.data.service.ReportGenerator;
 import com.example.application.views.MainLayout;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
+import com.vaadin.flow.component.grid.contextmenu.GridMenuItem;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -23,7 +33,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
@@ -82,7 +94,6 @@ public class ClientView extends Div implements BeforeEnterObserver {
                 UI.getCurrent().navigate(ClientView.class);
             }
         });
-        
         consultarProductos();
 
 
@@ -160,8 +171,44 @@ public class ClientView extends Div implements BeforeEnterObserver {
 	                n.addThemeVariants(NotificationVariant.LUMO_ERROR);
 	            } 
         });
+        
+        GridContextMenu<ClientModel> menu = grid.addContextMenu();
+        GridMenuItem<ClientModel> generarReporte = menu.addItem("Generar Reporte PDF", event -> {
+        	Notification.show("Generando reporte PDF...");
+    		generarReporte();
+        });
+        generarReporte.addComponentAsFirst(createIcon(VaadinIcon.PRINT));
+        
+        
     }//FIN PUBLIC CLIENT VIEW
 
+    
+    private void generarReporte() {
+		ReportGenerator generador = new ReportGenerator();
+		ClientReport datasource = new ClientReport();
+		datasource.setclients(clients);
+		Map<String, Object> parameters = new HashMap<>();
+		
+		
+		boolean generado = generador.gererarReportePDF("reporteclientes", datasource, parameters);
+		if(generado) {
+			Anchor url = new Anchor(generador.getReportPath(), "Reporte");
+			url.setTarget("_blank");
+			Notification.show("Reporte Generado: "+generador.getReportPath(), 5000, Notification.Position.TOP_CENTER);
+		}else {
+			Notification.show("Ocurrio un problema al generar el reporte");
+		}
+		
+	}
+    
+    
+	private Component createIcon(VaadinIcon vaadinIcon) {
+        Icon icon = vaadinIcon.create();
+        icon.getStyle().set("color", "var(--lumo-secondary-text-color)")
+                .set("margin-inline-end", "var(--lumo-space-s")
+                .set("padding", "var(--lumo-space-xs");
+        return icon;
+    }
 
 	private void consultarProductos() {
 		try {
@@ -172,7 +219,7 @@ public class ClientView extends Div implements BeforeEnterObserver {
         	
 		} catch (IOException e) {
 			// TODO: handle exception
-			Notification.show("No se puedieron cargar los paquetes.");
+			Notification.show("No se puedieron cargar los clientes.");
 			e.printStackTrace();
 		}
 	}

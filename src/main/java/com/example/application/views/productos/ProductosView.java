@@ -18,6 +18,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
 import com.vaadin.flow.component.grid.contextmenu.GridMenuItem;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
@@ -119,13 +120,13 @@ public class ProductosView extends Div implements BeforeEnterObserver, Productos
             	controlador.agregarProductoCarrito(productoCarrito);
         	}        	
         });
-        /*
+        
         GridMenuItem<PackageModel> generarReporte = menu.addItem("Generar Reporte PDF", event -> {
         	Notification.show("Generando reporte PDF...");
     		generarReporte();
         	
         });
-        */
+        
         menu.add(new Hr());
         GridMenuItem<PackageModel> delete = menu.addItem("Eliminar", event -> {
         	if (event != null && event.getItem() != null) {
@@ -150,7 +151,7 @@ public class ProductosView extends Div implements BeforeEnterObserver, Productos
         });
         delete.addComponentAsFirst(createIcon(VaadinIcon.TRASH));
         comprar.addComponentAsFirst(createIcon(VaadinIcon.SHOP));
-      //  generarReporte.addComponentAsFirst(createIcon(VaadinIcon.SHOP));
+        generarReporte.addComponentAsFirst(createIcon(VaadinIcon.PRINT));
         consultarProductos();
         
 
@@ -200,16 +201,25 @@ public class ProductosView extends Div implements BeforeEnterObserver, Productos
             } 
         });
     }
-/*
+
 	private void generarReporte() {
 		ReportGenerator generador = new ReportGenerator();
 		ProductosReport datasource = new ProductosReport();
 		datasource.setProductos(models);
 		Map<String, Object> parameters = new HashMap<>();
-		generador.gererarReportePDF("reporteproductos", datasource, parameters);
-		//generador.generarReportePDF("reporteproductos", datasource, parameters );
+		
+		
+		boolean generado = generador.gererarReportePDF("reporteproductos", datasource, parameters);
+		if(generado) {
+			Anchor url = new Anchor(generador.getReportPath(), "Reporte");
+			url.setTarget("_blank");
+			Notification.show("Reporte Generado: "+generador.getReportPath(), 5000, Notification.Position.TOP_CENTER);
+		}else {
+			Notification.show("Ocurrio un problema al generar el reporte");
+		}
+		
 	}
-*/
+
 	private void consultarProductos() {
 		controlador.consultarProductos();
 	}
