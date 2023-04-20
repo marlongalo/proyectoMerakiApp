@@ -1,6 +1,6 @@
 package com.example.application.views.client;
 
-import com.example.application.data.entity.ClientModel;
+import com.example.application.data.entity.Client;
 import com.example.application.data.entity.ClientReport;
 import com.example.application.data.entity.ClientResponse;
 import com.example.application.data.entity.PackageModel;
@@ -47,7 +47,7 @@ public class ClientView extends Div implements BeforeEnterObserver {
     private final String CLIENTMODEL_ID = "clientModelID";
     private final String CLIENTMODEL_EDIT_ROUTE_TEMPLATE = "client/%s/edit";
 
-    private final Grid<ClientModel> grid = new Grid<>(ClientModel.class, false);
+    private final Grid<Client> grid = new Grid<>(Client.class, false);
 
     private TextField name;
     private TextField address;
@@ -57,10 +57,10 @@ public class ClientView extends Div implements BeforeEnterObserver {
     private final Button cancel = new Button("Cancelar");
     private final Button save = new Button("Guardar");
 
-    private ClientModel clientModel;
+    private Client client;
     
     private DatabaseRepositoryImpl db;
-    private List<ClientModel> clients;//cambio 1
+    private List<Client> clients;//cambio 1
 
     public ClientView() {
         
@@ -104,20 +104,20 @@ public class ClientView extends Div implements BeforeEnterObserver {
 
         save.addClickListener(e -> {
             try {
-                if (this.clientModel == null) {
-                    this.clientModel = new ClientModel();
-                    this.clientModel.setName(name.getValue());
-                    this.clientModel.setAddress(address.getValue());
-                    this.clientModel.setPhone(phone.getValue());//Creacion Cambio 2
-                    this.clientModel.setEmail(email.getValue());//Creacion Cambio 2
+                if (this.client == null) {
+                    this.client = new Client();
+                    this.client.setName(name.getValue());
+                    this.client.setAddress(address.getValue());
+                    this.client.setPhone(phone.getValue());//Creacion Cambio 2
+                    this.client.setEmail(email.getValue());//Creacion Cambio 2
                    
-                    if(this.clientModel.getName()==null) {
+                    if(this.client.getName()==null) {
         				Notification.show("Para agregar un registro el campo nombre es requerido, favor digitar un valor valido");
-        			}else if(this.clientModel.getPhone()==null || this.clientModel.getPhone().isEmpty()) {
+        			}else if(this.client.getPhone()==null || this.client.getPhone().isEmpty()) {
         				Notification.show("Para agregar un registro el campo telefono es requerido, favor digitar un valor valido");
         			}else {
         				try {
-        					boolean creado = db.crearClientes(clientModel);
+        					boolean creado = db.crearClientes(client);
         					if(creado) {
         						Notification.show("Ficha del Cliente creado satisfactoriamente...");
         						clearForm();
@@ -136,18 +136,18 @@ public class ClientView extends Div implements BeforeEnterObserver {
         			}
         		}else {
         			//ACTUALIZACION
-        			this.clientModel.setName(name.getValue());
-                    this.clientModel.setAddress(address.getValue());
-                    this.clientModel.setPhone(phone.getValue());//Creacion Cambio 2
-                    this.clientModel.setEmail(email.getValue());//Creacion Cambio 2
+        			this.client.setName(name.getValue());
+                    this.client.setAddress(address.getValue());
+                    this.client.setPhone(phone.getValue());//Creacion Cambio 2
+                    this.client.setEmail(email.getValue());//Creacion Cambio 2
                     
-                    if(this.clientModel.getName()==null) {
+                    if(this.client.getName()==null) {
         				Notification.show("El nombre es requerido, favor digitar un valor valido");
-        			}else if(this.clientModel.getPhone()==null || this.clientModel.getPhone().isEmpty()) {
+        			}else if(this.client.getPhone()==null || this.client.getPhone().isEmpty()) {
         				Notification.show("El nombre es requerido, favor digitar un valor valido");
         			}else {
         			try {
-    					boolean actualizado = db.actualizarClientes(clientModel);
+    					boolean actualizado = db.actualizarClientes(client);
 	    					if(actualizado) {	    						
 	    						clearForm();
 	    		                refreshGrid();
@@ -172,8 +172,8 @@ public class ClientView extends Div implements BeforeEnterObserver {
 	            } 
         });
         
-        GridContextMenu<ClientModel> menu = grid.addContextMenu();
-        GridMenuItem<ClientModel> generarReporte = menu.addItem("Generar Reporte PDF", event -> {
+        GridContextMenu<Client> menu = grid.addContextMenu();
+        GridMenuItem<Client> generarReporte = menu.addItem("Generar Reporte PDF", event -> {
         	Notification.show("Generando reporte PDF...");
     		generarReporte();
         });
@@ -188,7 +188,7 @@ public class ClientView extends Div implements BeforeEnterObserver {
 		ClientReport datasource = new ClientReport();
 		datasource.setclients(clients);
 		Map<String, Object> parameters = new HashMap<>();
-		
+		parameters.put("LOGOCLIENTES_DIR", "reporte2.png");//aca cargamos la imagen
 		
 		boolean generado = generador.gererarReportePDF("reporteclientes", datasource, parameters);
 		if(generado) {
@@ -214,7 +214,7 @@ public class ClientView extends Div implements BeforeEnterObserver {
 		try {
         	ClientResponse clientes = db.listarClientes();	
         	clients = clientes.getItems();//cambio 1
-        	Collection<ClientModel> collectionPaquetes = clientes.getItems();
+        	Collection<Client> collectionPaquetes = clientes.getItems();
         	grid.setItems(collectionPaquetes);
         	
 		} catch (IOException e) {
@@ -233,9 +233,9 @@ public class ClientView extends Div implements BeforeEnterObserver {
         	Long ID = clientModelId.get();
         	Integer idInteger = ID != null ? ID.intValue() : null;
         	
-        	for (ClientModel clientModel : clients ) {//cambio 1
-        		if(clientModel.getClientID() == idInteger) {//cambio 1
-        			populateForm(clientModel);//cambio 1
+        	for (Client client : clients ) {//cambio 1
+        		if(client.getClientID() == idInteger) {//cambio 1
+        			populateForm(client);//cambio 1
         			break;//cambio 1
         		}//cambio 1
         	}//cambio 1
@@ -290,8 +290,8 @@ public class ClientView extends Div implements BeforeEnterObserver {
         populateForm(null);
     }
 
-    private void populateForm(ClientModel value) {
-        this.clientModel = value;
+    private void populateForm(Client value) {
+        this.client = value;
         if(value == null) {//cambio 1
            	name.setValue("");//cambio 1
             address.setValue("");//cambio 1

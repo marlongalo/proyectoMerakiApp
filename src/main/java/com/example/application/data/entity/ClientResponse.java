@@ -4,17 +4,17 @@ import java.util.List;
 
 public class ClientResponse {
 
-	private List<ClientModel> items;
+	private List<Client> items;
 	private boolean hasMore;
 	private int limit;
 	private int offset;
 	private int count;
 	
 	
-	public List<ClientModel> getItems() {
+	public List<Client> getItems() {
 		return items;
 	}
-	public void setItems(List<ClientModel> items) {
+	public void setItems(List<Client> items) {
 		this.items = items;
 	}
 	public boolean isHasMore() {

@@ -7,7 +7,7 @@ import com.example.application.data.service.DatabaseRepositoryImpl;
 import com.example.application.views.MainLayout;
 import com.example.application.controller.CarritoPagoInteractor;
 import com.example.application.controller.CarritoPagoInteractorImpl;
-import com.example.application.data.entity.ClientModel;
+import com.example.application.data.entity.Client;
 import com.example.application.data.entity.ClientResponse;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -68,8 +68,8 @@ public class CarritoPagoView extends Div implements CarritoPagoViewModel{
 	private static final long serialVersionUID = 1L;
 	private ComboBox<String> clientCombo = new ComboBox<>();
 	//private ComboBox<String> clientCombo1 = new ComboBox<>();
-	Collection<ClientModel> collectionClientes;
-	private ClientModel clienteSelected;
+	Collection<Client> collectionClientes;
+	private Client clienteSelected;
    // private Hr dividerHr = new Hr();
   //  private Button calculate = new Button("Calcular");
 	private List<String> itemsClientes = new ArrayList<>();
@@ -477,7 +477,7 @@ public class CarritoPagoView extends Div implements CarritoPagoViewModel{
 
 
 	@Override
-	public void mostrarClientesEnCarrito(List<ClientModel> list) {
+	public void mostrarClientesEnCarrito(List<Client> list) {
 		try {
       	
         	collectionClientes.forEach( (cliente) -> {

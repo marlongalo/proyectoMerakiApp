@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 import javax.validation.constraints.Email;
 
 @Entity
-public class ClientModel extends AbstractEntity {
+public class Client extends AbstractEntity {
 
     private Integer clientid;
     private String name;

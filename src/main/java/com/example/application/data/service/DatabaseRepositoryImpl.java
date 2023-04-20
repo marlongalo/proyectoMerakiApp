@@ -2,7 +2,7 @@ package com.example.application.data.service;
 
 import java.io.IOException;
 
-import com.example.application.data.entity.ClientModel;
+import com.example.application.data.entity.Client;
 import com.example.application.data.entity.ClientResponse;
 import com.example.application.data.entity.PackageModel;
 import com.example.application.data.entity.PaqueteResponse;
@@ -89,14 +89,14 @@ public class DatabaseRepositoryImpl {
     
 
     
-    public boolean crearClientes(ClientModel nuevo) throws IOException {
+    public boolean crearClientes(Client nuevo) throws IOException {
     	Call<ResponseBody> call = client.getDatabaseRepository().crearClientes(nuevo);
     	Response<ResponseBody> response = call.execute();
     	return response.isSuccessful();
     }
     
     
-    public boolean actualizarClientes(ClientModel actualizar) throws IOException {
+    public boolean actualizarClientes(Client actualizar) throws IOException {
     	Call<ResponseBody> call = client.getDatabaseRepository().actualizarClientes(actualizar);
     	Response<ResponseBody> response = call.execute();
     	return response.isSuccessful();

@@ -207,13 +207,20 @@ public class ProductosView extends Div implements BeforeEnterObserver, Productos
 		ProductosReport datasource = new ProductosReport();
 		datasource.setProductos(models);
 		Map<String, Object> parameters = new HashMap<>();
-		
+		parameters.put("LOGO_DIR", "reporte1.png");//aca cargamos la imagen
 		
 		boolean generado = generador.gererarReportePDF("reporteproductos", datasource, parameters);
 		if(generado) {
-			Anchor url = new Anchor(generador.getReportPath(), "Reporte");
+			String ubicacionReporte = generador.getReportPath();
+			System.out.println(ubicacionReporte);
+			Anchor url = new Anchor(ubicacionReporte, "Reporte generado exitosamente");
 			url.setTarget("_blank");
-			Notification.show("Reporte Generado: "+generador.getReportPath(), 5000, Notification.Position.TOP_CENTER);
+			
+			Notification notification = new Notification(url);
+			notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+			notification.setDuration(10000);
+			notification.open();
+			//Notification.show("Reporte Generado: "+generador.getReportPath(), 5000, Notification.Position.TOP_CENTER);
 		}else {
 			Notification.show("Ocurrio un problema al generar el reporte");
 		}

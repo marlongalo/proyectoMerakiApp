@@ -1,5 +1,5 @@
 package com.example.application.data.service;
-import com.example.application.data.entity.ClientModel;
+import com.example.application.data.entity.Client;
 import com.example.application.data.entity.ClientResponse;
 import com.example.application.data.entity.PackageModel;
 import com.example.application.data.entity.PaqueteResponse;
@@ -34,7 +34,7 @@ public interface DatabaseRepository {
 	    "User-Agent: Retrofit-Sample-App"
 	})
 	@POST("turiApp/clientes")
-	Call<ResponseBody> crearClientes(@Body ClientModel nuevo);
+	Call<ResponseBody> crearClientes(@Body Client nuevo);
 	
 	
 	@Headers({
@@ -42,7 +42,7 @@ public interface DatabaseRepository {
 	    "User-Agent: Retrofit-Sample-App"
 	})
 	@PUT("turiApp/clientes")
-	Call<ResponseBody> actualizarClientes(@Body ClientModel actualizar);
+	Call<ResponseBody> actualizarClientes(@Body Client actualizar);
 	
 	
 	//*********************SERVICIOS DE PAQUETES******************************************
